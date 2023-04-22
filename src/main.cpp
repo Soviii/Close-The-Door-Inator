@@ -1,15 +1,24 @@
 #include <Arduino.h>
-
+#include <TFT_eSPI.h>
+#include <SPI.h>
+#include <Wire.h>
 
 //hard coding buzzer and button elements
-#define BUZZER_PIN GPIO_NUM_15
+#define BUZZER_PIN GPIO_NUM_2
 #define BUTTON_PIN GPIO_NUM_36
 #define DOOR_SENSOR_PIN GPIO_NUM_37
-#define BUZZ_FREQUENCY 500
+#define BUZZ_FREQUENCY 100
 
 
 
+bool initiallyOpened = true;
+int timeTillBuzz = 0; 
 int sensor = GPIO_NUM_36;
+
+
+//for TTGO display
+TFT_eSPI tft = TFT_eSPI(135, 240);
+char currScreenStatus = 'G';
 
 void testBuzzer(){
   tone(BUZZER_PIN, BUZZ_FREQUENCY, 250);
@@ -33,6 +42,18 @@ void testDoorSensor(){
     }
 }
 
+void checkFor5MinDelay(){ //low = button not pressed
+  if(digitalRead(BUTTON_PIN) == HIGH){
+      sleep(5); //in seconds
+    }
+
+  }
+
+
+
+
+
+
 void setup() {
   Serial.begin(9600);
   pinMode(sensor, INPUT);
@@ -41,14 +62,84 @@ void setup() {
   pinMode(BUZZER_PIN, OUTPUT); 
   pinMode(BUTTON_PIN, INPUT); 
   pinMode(DOOR_SENSOR_PIN, INPUT); 
+
+
+  tft.init();
+  tft.setRotation(1);
+
+  //setting up display on TTGO
+  // tft.init();
+  // tft.setRotation(1);
+  // tft.fillScreen(TFT_DARKGREEN);
+  // // tft.fillScreen(TFT_PINK);
+  tft.setTextSize(3);
+  tft.setTextColor(TFT_WHITE);
+  // // tft.setTextColor(TFT_BLUE);
+  tft.setCursor(0,0);
+  tft.setTextDatum(MC_DATUM);
+  tft.setTextSize(5);
 }
 
 void loop() {
-  testBuzzer(); 
-  testButton();
-  testDoorSensor(); 
+  // testBuzzer(); 
+  // testButton();
+  // testDoorSensor(); 
 
-  delay(1000);
+  if(digitalRead(DOOR_SENSOR_PIN) == LOW){  //if sensor is open
+    if(initiallyOpened){
+      timeTillBuzz = millis() + 2000; 
+      initiallyOpened = false;
+    }
+
+    currScreenStatus = 'Y';
+    if(millis() > timeTillBuzz){
+      testBuzzer();
+      currScreenStatus = 'R';
+      checkFor5MinDelay();
+    }
+  } else {
+    initiallyOpened = true;
+    currScreenStatus = 'G';
+  }
+
+  if (currScreenStatus == 'G'){
+    tft.fillScreen(TFT_GREEN);
+    tft.drawString("", tft.width()/2, tft.height()/2-16);
+  } else if (currScreenStatus == 'Y') {
+    tft.fillScreen(TFT_YELLOW);
+    tft.drawString("", tft.width()/2, tft.height()/2-16);
+  } else if (currScreenStatus == 'R') {
+    tft.fillScreen(TFT_RED);
+    tft.drawString("", tft.width()/2, tft.height()/2-16);
+  }
+
+  // switch (currScreenStatus){
+  //   case 'G':
+  //     tft.fillScreen(TFT_GREEN);
+  //     tft.drawString("", tft.width()/2, tft.height()/2-16);
+  //     // Serial.println("GREEN");
+
+  //     break;
+    
+  //   case 'Y':
+  //     tft.fillScreen(TFT_YELLOW);
+  //     tft.drawString("", tft.width()/2, tft.height()/2-16);
+  //     // Serial.println("YELLOW");
+
+
+  //     break;
+    
+  //   case 'R':
+  //     tft.fillScreen(TFT_RED);
+  //     tft.drawString("", tft.width()/2, tft.height()/2-16);
+  //     // Serial.println("RED");
+
+
+  //     break;
+  // }
+
+
+  delay(500);
 }
 
 
