@@ -37,8 +37,8 @@ char dailyScore[4] = "0/5";                       // for reporting score to LCD 
 unsigned long nextTimeToSaveTemperature = 900000; // after 15 minutes
 unsigned long nextTimeToDisplayReport = 10800000; // after 3 hours
 
-char ssid[] = "Sovi";     // network SSID (personal hotspot)
-char pass[] = "iVoS7769"; // network password
+char ssid[] = "<SSID>";     // network SSID (personal hotspot)
+char pass[] = "<PASSWORD>"; // network password
 const uint16_t port = 5000;
 
 const int kNetworkTimeout = 30 * 1000; // Number of milliseconds to wait without receiving any data before we give up
@@ -47,6 +47,7 @@ const int kNetworkDelay = 1000;        // Number of milliseconds to wait if no d
 // for temperature sensor
 DHT20 dht20; // DHT object for reading temperature and sensor
 float temperatureVal = 0;
+char displayTempValues[5] = "xx F";
 
 void soundBuzzer()
 {
@@ -97,6 +98,8 @@ void GatherAndPrintTemperature()
     temperatureVal = temperatureVal * (9 / 5) + 32;
     Serial.print("Temperature: ");
     Serial.println(temperatureVal);
+    displayTempValues[0] = String(temperatureVal)[0];
+    displayTempValues[1] = String(temperatureVal)[1];
 }
 
 /* source code from Part A; connecting to webpage using HTTP */
@@ -268,9 +271,15 @@ void setup()
     tft.setTextColor(TFT_BLACK);
     tft.setCursor(0, 0);
     tft.setTextDatum(MC_DATUM);
-    tft.setTextSize(5);
 
-    ConnectToWifi();
+    tft.fillScreen(TFT_BLACK);
+
+    ConnectToWifi(); // connecting to wifi
+
+    tft.fillScreen(TFT_CYAN);
+    tft.drawString("Wifi good", tft.width() / 2, tft.height() / 2 - 16);
+    tft.setTextSize(5);
+    sleep(3);
 }
 
 void loop()
@@ -308,6 +317,11 @@ void loop()
         unsigned long timeSpan = millis() - startOfOpenDoors;
         Serial.print("time span was: ");
         Serial.println(timeSpan);
+
+        tft.setTextSize(3);
+        tft.fillScreen(TFT_CYAN);
+        tft.drawString("Uploading...", tft.width() / 2, tft.height() / 2 - 16);
+        tft.setTextSize(5);
         ConnectToFlaskWebPage("save-alert", millis() - startOfOpenDoors);
         justClosed = false;
     }
@@ -350,6 +364,10 @@ void loop()
 
     if (millis() > nextTimeToSaveTemperature)
     { // need to save temperature after 15 minutes
+        tft.setTextSize(3);
+        tft.fillScreen(TFT_CYAN);
+        tft.drawString("Uploading...", tft.width() / 2, tft.height() / 2 - 16);
+        tft.setTextSize(5);
         ConnectToFlaskWebPage("save-temp", 0);
         nextTimeToSaveTemperature += 900000; // meaning in 15 minutes
     }
