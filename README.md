@@ -10,6 +10,18 @@ The hardware used for this project was buzzer actuator, physical touch button se
 ## Files changed
 The files changed were the main.cpp file found in the src folder, the platform.ini file, and the server.py file (used for cloud HTTP REST requests) in the home directory. 
 
+## Hardware images
 ![pic1](./images/IMG_7708.jpg)
 ![pic2](./images/IMG_7709.jpg)
 ![pic3](./images/IMG_7710.jpg)
+
+## Architecture Diagram
+![pic1](./images/IoT Pres4.png)
+
+## Screenshots of data stored on the cloud
+![pic5](./images/temperature.jpg)
+![pic6](./images/alerts.jpg)
+
+
+## Link to presentation slides
+https://docs.google.com/presentation/d/1o0-59pTTqp1iY5IngkDp5_4D2ZTq8fd22uQsllwkRkU/edit?usp=sharing
