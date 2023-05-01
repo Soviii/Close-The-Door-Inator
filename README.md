@@ -16,7 +16,7 @@ The files changed were the main.cpp file found in the src folder, the platform.i
 ![pic3](./images/IMG_7710.jpg)
 
 ## Architecture Diagram
-![pic1](./images/IoT Pres4.png)
+![pic4](./images/IoT%20Pres3.png)
 
 ## Screenshots of data stored on the cloud
 ![pic5](./images/temperature.jpg)
